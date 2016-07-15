@@ -30,20 +30,22 @@ const productSchema = new mongoose.Schema({
     updatedAt: {
         type: Date,
         default: moment().toDate()
-    }
+    },
+    priceAlerts: [{
+        alertType: {
+            type: String,
+            enum: [`email`, `text`]
+        },
+        contact: String,
+        price: {
+            type: Number,
+            min: 0
+        }
+    }]
 });
 
-// check for price triggers and send emails every updated
-// we should also do text, and have a field for type of notification, email or text
-// const mailObj = {
-//     to: [`bkemper@gmail.com`],
-//     prodName: `poop bags and stuff`,
-//     prodURL: `https://bkemper.me`,
-//     prodPrice: `19.99`
-// };
-// sendMail(mailObj);
-
-// check if we can remote the self = this by using fat arrow funtion
+// need to add support for texts
+// check if we can remove the self = this by using fat arrow funtion
 productSchema.methods.updatePrice = function() {
     var self = this;
     make.pFin.findItemDetails(self.URL, (err, details) => {
@@ -53,6 +55,26 @@ productSchema.methods.updatePrice = function() {
         self.prices.push({
             date: moment().toDate(),
             price: details.price
+        });
+        const emailsToAlert = [];
+        const phonesToAlert = [];
+        self.priceAlerts = self.priceAlerts.filter(e => {
+            if (e.price < details.price && e.alertType === `email`) {
+                emailsToAlert.push(e.contact);
+                return false;
+            } else if (e.price < details.price && e.alertType === `text`) {
+                phonesToAlert.push(e.contact);
+                return false;
+            } else {
+                return true;
+            }
+        });
+        sendMail({
+            to: emailsToAlert,
+            prodName: self.name,
+            prodURL: self.URL,
+            prodPrice: details.price,
+            prodSite: self.site
         });
         return self.save((saveErr, saveRes) => saveRes);
     });

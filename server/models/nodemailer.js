@@ -16,8 +16,8 @@ const sendMail = (mailObj) => {
         nodemailerMailgun.sendMail({
             from: `bkemper@gmail.com`,
             to: email,
-            subject: `${mailObj.prodName} dropped below ${mailObj.prodPrice}`,
-            html: `<b>HI ${email.split('@')[0]}, <a href="${mailObj.prodURL}">${mailObj.prodName}</a>dropped below ${mailObj.prodPrice}`
+            subject: `${mailObj.prodName} dropped below ${mailObj.prodPrice} at ${mailObj.prodSite}`,
+            html: `<b>HI ${email.split('@')[0]}, <a href="${mailObj.prodURL}">${mailObj.prodName}</a>dropped below ${mailObj.prodPrice} at ${mailObj.prodSite}`
         }, function(err, info) {
             if (err) {
                 console.log(`Error: ` + err);
