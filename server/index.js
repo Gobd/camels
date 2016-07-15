@@ -6,6 +6,7 @@ const bodyParser = require(`body-parser`),
 
 const app = express();
 app.use(bodyParser.json());
+app.use(express.static(__dirname+ './../public'))
 
 mongoose.connect(`mongodb://localhost/Camels`);
 const db = mongoose.connection;
